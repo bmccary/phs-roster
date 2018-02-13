@@ -21,5 +21,5 @@
 
 # Status
 
-I'm waiting on you to confirm this process works for you.
+I'm waiting on you to confirm this process works for you. Once you've got this working, I'll hack together `spreadsheet-of-text-NetIDs-to-spreadsheet-of-images-and-whatnot` script.
 
