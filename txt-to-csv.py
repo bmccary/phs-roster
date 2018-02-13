@@ -85,31 +85,22 @@ def go(args):
 
             j += 1
 
-    rows = [row for row in g()]
+    rows = list(g())
 
     sorted_rows = sorted(rows, key=itemgetter('last_name', 'first_name', 'netid'))
 
     if rows != sorted_rows:
-        sys.stderr.write('\n')
-        sys.stderr.write('\n')
-        sys.stderr.write('\n')
-        sys.stderr.write('Not sorted!\n')
-        sys.stderr.write('\n')
-        sys.stderr.write('\n')
-        sys.stderr.write('\n')
+        sys.stderr.write('\n'*8)
+        sys.stderr.write('*'*80 + '\n')
+        sys.stderr.write('Not sorted! There could be an association problem!\n')
+        sys.stderr.write('*'*80 + '\n')
+        sys.stderr.write('\n'*8)
 
     rows = sorted_rows
 
     X = set(x['netid'] for x in rows)
 
-    if len(X) != len(rows):
-        sys.stderr.write('\n')
-        sys.stderr.write('\n')
-        sys.stderr.write('\n')
-        sys.stderr.write('Not unique!\n')
-        sys.stderr.write('\n')
-        sys.stderr.write('\n')
-        sys.stderr.write('\n')
+    assert len(X) == len(rows), 'Non-unique NetIDs.'
 
     def g():
         for i, row in enumerate(rows):
