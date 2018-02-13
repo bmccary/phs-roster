@@ -9,12 +9,11 @@ import re
 
 import csv
 
-STUDENT = re.compile(r'(?P<last_name>[^,]+),\s+(?P<first_name>[^(]+)\((?P<netid>[^)]*)\)')
+STUDENT = re.compile(r'^(?P<last_name>[^,]+),\s+(?P<first_name>[^(]+)\((?P<netid>[^)]*)\)$')
 
 def go(args):
 
     if args.txt == '-':
-        file0 = sys.stdin
         s = sys.stdin.read()
     else:
         with open(args.txt, 'r') as r:
@@ -29,7 +28,7 @@ def go(args):
 
     def g():
 
-        i = 0
+        j = 0
         i_missing_netid = 0
 
         for line in s.readlines():
@@ -78,13 +77,13 @@ def go(args):
                 i_missing_netid += 1
 
             yield { 
-                        'i'          : '{:03d}'.format(i),
+                        'j'          : '{:03d}'.format(j),
                         'last_name'  : last_name, 
                         'first_name' : first_name, 
                         'netid'      : netid,
                     }
 
-            i += 1
+            j += 1
 
     rows = [row for row in g()]
 
@@ -112,7 +111,14 @@ def go(args):
         sys.stderr.write('\n')
         sys.stderr.write('\n')
 
-    fieldnames = ['i', 'netid', 'last_name', 'first_name',]
+    def g():
+        for i, row in enumerate(rows):
+            row['i'] = '{:03d}'.format(i)
+            yield row
+
+    rows = list(g())
+
+    fieldnames = ['i', 'netid', 'last_name', 'first_name', 'j',]
 
     if args.csv == '-':
         c = csv.DictWriter(sys.stdout, fieldnames=fieldnames)
