@@ -14,12 +14,15 @@ PNG = $(LINK:%.ppm=%.png)
 
 VERIFY = $(PNG:%.png=%.verify)
 
-ALL := .link .link-r .png .verify .verify-r .ppm $(PPM) $(TXT) $(CSV)
+ALL := .csv .link .link-r .png .png-r .ppm .verify .verify-r $(PPM) $(TXT) $(CSV)
 
 all: $(ALL)
 
 clean:
 	rm -rf netid $(ALL)
+
+.csv: $(CSV)
+	touch $@
 
 .ppm: $(PPM)
 	touch $@
@@ -48,13 +51,18 @@ netid/%.ppm: $(CSV)
 .link-r: $(LINK)
 	touch $@
 
-.png: .ppm $(PNG)
+.png: .csv .ppm
+	$(MAKE) .png-r
+	touch $@
+
+.png-r: $(PNG)
 	touch $@
 
 netid/%.png: netid/%.ppm
 	convert $< $@
 
 .verify: .png always 
+	evince $(PDF) &
 	$(MAKE) .verify-r
 	touch $@
 
@@ -62,7 +70,6 @@ netid/%.png: netid/%.ppm
 	touch $@
 
 %.verify: %.png
-	evince $(PDF) &
 	display $< & echo $$! > $*.pid
 	if zenity --question --text='Is it $(notdir $*)?'; then touch $@; fi
 	kill $$(< $*.pid) || true

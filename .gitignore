@@ -1,12 +1,16 @@
 *.pdf
 *.ppm
 *.png
+*.txt
+*.csv
 *.ppm/
 netid/
 
-.link 
-.link-r 
-.png 
+.csv
+.link
+.link-r
+.png
+.png-r
 .ppm
-.verify 
-.verify-r 
+.verify
+.verify-r
