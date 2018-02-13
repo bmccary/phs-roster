@@ -1,9 +1,12 @@
 
 SHELL := /bin/bash
 
-ROSTER := roster.pdf
+PDF := $(wildcard *.pdf)
+PPM := $(PDF:%.pdf=%.ppm)
+TXT := $(PDF:%.pdf=%.txt)
+CSV := $(PDF:%.pdf=%.csv)
 
-NETID = $(shell cat roster.csv | cut -f 2 -d , | tail -n +2)
+NETID = $(shell cat $(CSV) | cut -f 2 -d , | grep -v netid)
 
 LINK = $(NETID:%=netid/%.ppm)
 
@@ -11,18 +14,20 @@ PNG = $(LINK:%.ppm=%.png)
 
 VERIFY = $(PNG:%.png=%.verify)
 
-ALL := .pdfimage .link .link-r .png .verify .verify-r roster.txt roster.csv
+ALL := .link .link-r .png .verify .verify-r .ppm $(PPM) $(TXT) $(CSV)
 
 all: $(ALL)
 
 clean:
-	rm -rf image netid $(ALL)
+	rm -rf netid $(ALL)
 
-.pdfimage: $(ROSTER) roster.csv
-	rm -rf image
-	mkdir -p image
-	pdfimages '$(ROSTER)' image/i
+.ppm: $(PPM)
 	touch $@
+
+%.ppm: %.pdf $(CSV)
+	rm -rf $@
+	mkdir -p $@
+	pdfimages '$<' $@/i
 
 %.txt: %.pdf
 	pdftotext '$<'
@@ -30,12 +35,12 @@ clean:
 %.csv: %.txt
 	python txt-to-csv.py --txt '$<' --csv '$@' --debug 1
 
-netid/%.ppm: roster.csv 
+netid/%.ppm: $(CSV)
 	mkdir -p netid
 	rm -f '$@'
-	cd netid && ln -s '../image/i-$(shell grep $* $< | cut -f 1 -d ,).ppm' '$(notdir $@)'
+	cd netid &&  ln -s '../$(basename $(shell grep -l $* $+)).ppm/i-$(shell grep -h $* $$(grep -l $* $+) | cut -f 1 -d ,).ppm' '$(notdir $@)'
 
-.link: roster.csv
+.link: $(CSV)
 	rm -rf netid
 	$(MAKE) .link-r
 	touch $@
@@ -43,23 +48,21 @@ netid/%.ppm: roster.csv
 .link-r: $(LINK)
 	touch $@
 
-.png: $(PNG)
+.png: .ppm $(PNG)
 	touch $@
 
-%.png: %.ppm
+netid/%.png: netid/%.ppm
 	convert $< $@
 
-.verify: always 
-	evince roster.pdf & echo $$! > .verify.pid
+.verify: .png always 
 	$(MAKE) .verify-r
-	kill $$(< .verify.pid) || true
-	rm -f .verify.pid
 	touch $@
 
 .verify-r: $(VERIFY)
 	touch $@
 
 %.verify: %.png
+	evince $(PDF) &
 	display $< & echo $$! > $*.pid
 	if zenity --question --text='Is it $(notdir $*)?'; then touch $@; fi
 	kill $$(< $*.pid) || true

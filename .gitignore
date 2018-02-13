@@ -1,3 +1,12 @@
-roster.*
-image/
+*.pdf
+*.ppm
+*.png
+*.ppm/
 netid/
+
+.link 
+.link-r 
+.png 
+.ppm
+.verify 
+.verify-r 
