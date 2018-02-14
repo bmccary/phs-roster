@@ -16,9 +16,6 @@ NETID := $(ROSTER:%=$(BUILD)/%/netid)
 
 PNG = $(foreach x,$(NETID),$(wildcard $(x)/*.png))
 
-PPM0 = $(foreach x,$(PPM),$(wildcard $(x)/$(PREFIX)-*.png))
-PPM1 = $(foreach x,$(PPM0),$(wildcard $(x)/$(PREFIX)-*.png))
-
 ALL := .csv .pdf .ppm .txt .recurse .netid
 
 all: $(ALL)
