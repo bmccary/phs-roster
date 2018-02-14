@@ -58,7 +58,7 @@ $(BUILD)/%.pdf/txt: %.pdf
 	pdftotext '$<' '$@'
 
 $(BUILD)/%.pdf/csv: $(BUILD)/%.pdf/txt
-	python txt-to-csv.py --txt '$<' --csv '$@' --debug 1
+	$(PYTHON) txt-to-csv.py --txt '$<' --csv '$@' --debug 1
 
 $(BUILD)/%.pdf/recurse: build.mk .csv .pdf .ppm .txt always
 	cd $(dir $@) && $(MAKE) -f $(realpath $<)

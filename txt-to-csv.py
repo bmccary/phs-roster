@@ -1,5 +1,7 @@
 
-from cStringIO import StringIO
+from __future__ import print_function
+
+from io import StringIO
 
 from operator import itemgetter
 
@@ -36,23 +38,23 @@ def go(args):
             line = line.strip()
 
             if not line:
-                if args.debug > 1: print 'D:', line
+                if args.debug > 1: print('D:', line)
                 continue
 
             if line.startswith('UT Dallas ::'):
-                if args.debug > 1: print 'D:', line
+                if args.debug > 1: print('D:', line)
                 continue
 
             if line.startswith('Printed:'):
-                if args.debug > 1: print 'D:', line
+                if args.debug > 1: print('D:', line)
                 continue
 
             if line.startswith('Generated:'):
-                if args.debug > 1: print 'D:', line
+                if args.debug > 1: print('D:', line)
                 continue
 
             if line.isdigit():
-                if args.debug > 1: print 'D:', line
+                if args.debug > 1: print('D:', line)
                 continue
 
             m = STUDENT.match(line)
@@ -60,7 +62,7 @@ def go(args):
             if not m:
                 raise Exception('Parse error: "{}"'.format(line))
 
-            if args.debug > 0: print 'S:', line
+            if args.debug > 0: print('S:', line)
       
             last_name  = m.group('last_name')
             first_name = m.group('first_name')

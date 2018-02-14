@@ -19,3 +19,5 @@ YESNO_DIALOG = dialog --title 'Feed me, human!' --yesno 'Is it $(1)?' 8 60
 YESNO_ZENITY = zenity --question --text='Is it $(1)?'
 YESNO = $(YESNO_ZENITY)
 
+PYTHON := python3
+
