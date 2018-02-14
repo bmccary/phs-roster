@@ -1,79 +1,76 @@
 
 SHELL := /bin/bash
 
-PDF := $(wildcard *.pdf)
-PPM := $(PDF:%.pdf=%.ppm)
-TXT := $(PDF:%.pdf=%.txt)
-CSV := $(PDF:%.pdf=%.csv)
+BUILD := build
 
-NETID = $(shell cat $(CSV) | cut -f 2 -d , | grep -v netid)
+PREFIX := i
 
-LINK = $(NETID:%=netid/%.ppm)
+ROSTER := $(wildcard *.pdf)
 
-PNG = $(LINK:%.ppm=%.png)
+CSV := $(ROSTER:%=$(BUILD)/%/csv)
+PDF := $(ROSTER:%=$(BUILD)/%/pdf)
+PPM := $(ROSTER:%=$(BUILD)/%/ppm)
+TXT := $(ROSTER:%=$(BUILD)/%/txt)
 
-VERIFY = $(PNG:%.png=%.verify)
+RECURSE := $(ROSTER:%=$(BUILD)/%/recurse)
 
-ALL := .csv .link .link-r .png .png-r .ppm .verify .verify-r $(PPM) $(TXT) $(CSV)
+NETID := $(ROSTER:%=$(BUILD)/%/netid)
+
+PNG = $(shell find $(NETID) -name '*.png')
+
+ALL := .csv .pdf .ppm .txt .recurse .netid
 
 all: $(ALL)
 
 clean:
-	rm -rf netid $(ALL)
+	rm -rf $(BUILD) $(ALL)
 
 .csv: $(CSV)
+	touch $@
+
+.pdf: $(PDF)
 	touch $@
 
 .ppm: $(PPM)
 	touch $@
 
-%.ppm: %.pdf $(CSV)
+.txt: $(TXT)
+	touch $@
+
+.recurse: $(RECURSE)
+	touch $@
+
+$(BUILD)/%.pdf/pdf: %.pdf
+	rm -f $@
+	mkdir -p $(dir $@)
+	cd $(dir $@) && ln -s '../../$<' pdf
+
+$(BUILD)/%.pdf/ppm: %.pdf
 	rm -rf $@
 	mkdir -p $@
-	pdfimages '$<' $@/i
+	pdfimages '$<' '$@/$(PREFIX)'
 
-%.txt: %.pdf
-	pdftotext '$<'
+$(BUILD)/%.pdf/txt: %.pdf
+	mkdir -p $(dir $@)
+	pdftotext '$<' '$@'
 
-%.csv: %.txt
+$(BUILD)/%.pdf/csv: $(BUILD)/%.pdf/txt
 	python txt-to-csv.py --txt '$<' --csv '$@' --debug 1
 
-netid/%.ppm: $(CSV)
-	mkdir -p netid
-	rm -f '$@'
-	cd netid &&  ln -s '../$(basename $(shell grep -l $* $+)).ppm/i-$(shell grep -h $* $$(grep -l $* $+) | cut -f 1 -d ,).ppm' '$(notdir $@)'
-
-.link: $(CSV)
-	rm -rf netid
-	$(MAKE) .link-r
+$(BUILD)/%.pdf/recurse: build.mk always
+	cd $(dir $@) && $(MAKE) PREFIX=$(PREFIX) -f ../../$<
 	touch $@
 
-.link-r: $(LINK)
-	touch $@
+.netid: always
+	$(MAKE) .netid-r
 
-.png: .csv .ppm
-	$(MAKE) .png-r
-	touch $@
-
-.png-r: $(PNG)
-	touch $@
-
-netid/%.png: netid/%.ppm
-	convert $< $@
-
-.verify: .png always 
-	evince $(PDF) &
-	$(MAKE) .verify-r
-	touch $@
-
-.verify-r: $(VERIFY)
-	touch $@
-
-%.verify: %.png
-	display $< & echo $$! > $*.pid
-	if zenity --question --text='Is it $(notdir $*)?'; then touch $@; fi
-	kill $$(< $*.pid) || true
-	rm -f $*.pid
+.netid-r: always
+	rm -rf $(BUILD)/netid
+	mkdir -p $(BUILD)/netid
+	for i in $(PNG); \
+	do \
+		ln -r -s -t $(BUILD)/netid $$i; \
+	done
 
 always: ;
 

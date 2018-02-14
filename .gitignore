@@ -1,16 +1,10 @@
 *.pdf
-*.ppm
-*.png
-*.txt
-*.csv
-*.ppm/
-netid/
+*.swp
+
+build/
 
 .csv
-.link
-.link-r
-.png
-.png-r
+.pdf
 .ppm
-.verify
-.verify-r
+.recurse
+.txt
