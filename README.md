@@ -15,6 +15,7 @@
       1. This verification step is necessary because the composition tool which UTD uses to create this PDF does not always put the images and text close to each other (in the PDF bytestream). 
       1. Every so often, this results in an off-by-one problem. E.g.  1. 1 -> 1, 2 -> 2, ..., 42 -> 42, 43 -> 44, 44 -> 45, ..., 86 -> 87, 87 -> 43.
       1. The easiest (only) fix for this is to open up the corresponding `.csv` file, fix it by hand, then re-run `make`. The process will pick back up from that place.
+      1. **But this out-of-order problem may have been fixed by simply sorting the students found in the text file, time will tell.**
 1. The `build/netid` will be populated with files of the form `abc123456.png` 
 
 # Status
