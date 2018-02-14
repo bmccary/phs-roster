@@ -5,6 +5,7 @@
 1. `cd phs-roster`
 1. Download the roster(s) in question from CourseBook and save it in `phs-roster`. 
    1. It is fine to put as many in here as you want, but you probably want to download a PDF, run `make`, download a new PDF, run `make`, et cetera.
+   1. Rosters need to be saved with names that contain no whitespace or other characters which are special to `bash` or `make`.
 1. `make`
 1. From each roster several files/directories will be made. E.g., for a roster `foo.pdf`:
    1. `build/foo.pdf/txt`: The text stripped from the PDF.
