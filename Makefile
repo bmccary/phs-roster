@@ -1,9 +1,7 @@
 
 SHELL := /bin/bash
 
-BUILD := build
-
-PREFIX := pdfimages-has-a-bad-ui-and-that-makes-me-sad
+include options.mk
 
 ROSTER := $(wildcard *.pdf)
 
@@ -17,6 +15,9 @@ RECURSE := $(ROSTER:%=$(BUILD)/%/recurse)
 NETID := $(ROSTER:%=$(BUILD)/%/netid)
 
 PNG = $(foreach x,$(NETID),$(wildcard $(x)/*.png))
+
+PPM0 = $(foreach x,$(PPM),$(wildcard $(x)/$(PREFIX)-*.png))
+PPM1 = $(foreach x,$(PPM0),$(wildcard $(x)/$(PREFIX)-*.png))
 
 ALL := .csv .pdf .ppm .txt .recurse .netid
 
@@ -49,7 +50,11 @@ $(BUILD)/%.pdf/ppm: %.pdf
 	rm -rf '$@'
 	mkdir -p '$@'
 	pdfimages '$<' '$@/$(PREFIX)'
-	cd '$@' && rename -v 's/$(PREFIX)-(...)\.ppm/$$1\.ppm/' *.ppm
+	cd $@ && \
+	for i in $(PREFIX)-*.ppm; \
+	do \
+		mv $$i $$(echo $$i | sed s/$(PREFIX)-//g); \
+	done
 
 $(BUILD)/%.pdf/txt: %.pdf
 	mkdir -p $(dir $@)
@@ -58,8 +63,8 @@ $(BUILD)/%.pdf/txt: %.pdf
 $(BUILD)/%.pdf/csv: $(BUILD)/%.pdf/txt
 	python txt-to-csv.py --txt '$<' --csv '$@' --debug 1
 
-$(BUILD)/%.pdf/recurse: build.mk always
-	cd $(dir $@) && $(MAKE) -f ../../$<
+$(BUILD)/%.pdf/recurse: build.mk .csv .pdf .ppm .txt always
+	cd $(dir $@) && $(MAKE) -f $(realpath $<)
 	touch $@
 
 .netid: always
@@ -67,7 +72,26 @@ $(BUILD)/%.pdf/recurse: build.mk always
 	mkdir -p $(BUILD)/netid
 	for i in $(PNG); \
 	do \
-		ln -r -s -t $(BUILD)/netid "$$i"; \
+		d=$(BUILD)/netid/$$(echo $$i | sed -r 's/$(BUILD)\/(.+\.pdf)\/netid\/(.+)\.png/\2\/\1\.png/g'); \
+		mkdir -p $$(dirname $$d); \
+		ln -r -s $$i $$d; \
+	done
+	cd $(BUILD)/netid; \
+	for i in *; \
+	do \
+		case $$(ls -1 $$i | wc -l) in \
+			0) \
+				echo "No files in $$i"; \
+				exit 1; \
+				;; \
+			1) \
+				;; \
+			*) \
+				echo "netid '$$i' appears in more than one roster (may be OK):"; \
+				for k in $$(ls -1 $$i); do echo -n "    "; readlink -f $$i/$$k; done; \
+				;; \
+		esac; \
+		ln -s $$i/$$(ls -1 $$i | head -n 1) $$i.png; \
 	done
 
 always: ;
