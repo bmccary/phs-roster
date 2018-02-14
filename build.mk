@@ -24,8 +24,8 @@ netid/%.png: csv
 	rm -f '$@'
 	mkdir -p $(dir $@)
 	display 'ppm/$(PREFIX)-$(shell grep $* $< | cut -f 1 -d ,).ppm' & echo "$$!" > "$*.pid"
-	#if zenity --question --text='Is it $(notdir $*)?'; then convert 'ppm/$(PREFIX)-$(shell grep $* $< | cut -f 1 -d ,).ppm' '$@'; else exit 1; fi
-	if dialog --title 'Feed me, human!' --yesno 'Is it $(notdir $*)?' 10 60; then convert 'ppm/$(PREFIX)-$(shell grep $* $< | cut -f 1 -d ,).ppm' '$@'; else exit 1; fi
+	if zenity --question --text='Is it $(notdir $*)?'; then convert 'ppm/$(PREFIX)-$(shell grep $* $< | cut -f 1 -d ,).ppm' '$@'; else exit 1; fi
+	#if dialog --title 'Feed me, human!' --yesno 'Is it $(notdir $*)?' 10 60; then convert 'ppm/$(PREFIX)-$(shell grep $* $< | cut -f 1 -d ,).ppm' '$@'; else exit 1; fi
 	kill "$$(< $*.pid)" || true
 	rm -f "$*.pid"
 
