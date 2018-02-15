@@ -27,7 +27,7 @@ netid-to-index = $(shell grep $(1) $(2) | cut -f 1 -d ,)
 netid/%.png: csv
 	rm -f '$@'
 	mkdir -p $(dir $@)
-	$(IMAGE_VIEWER) 'ppm/$(call netid-to-index,$*,$<).ppm' & echo "$$!" > '$*.pid'
+	if [[ "$(YESNO)" != "YESNO_TRUE" ]]; then $(IMAGE_VIEWER) 'ppm/$(call netid-to-index,$*,$<).ppm' & echo "$$!" > '$*.pid'; fi
 	if $(call $(YESNO),$(notdir $*)); then convert -resize x$(IMAGE_CONVERT_HEIGHT) 'ppm/$(call netid-to-index,$*,$<).ppm' '$@'; else exit 1; fi
 	kill "$$(< $*.pid)" || true
 	rm -f '$*.pid'

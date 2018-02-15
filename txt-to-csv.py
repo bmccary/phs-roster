@@ -26,7 +26,14 @@ def go(args):
     s = s.replace('\n\n','\n')
     s = s.replace('\n(',' (')
     s = s.replace(',\n',', ')
-    s = StringIO(unicode(s))
+
+    try:
+        t = unicode(s)
+        s = t
+    except NameError:
+        pass
+
+    s = StringIO(s)
 
     def g():
 
