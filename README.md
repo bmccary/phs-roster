@@ -7,6 +7,8 @@
 
 # To Parse out NetID Images from CourseBook
 
+In order for this to work, you'll need to install `poppler`.
+
 1. Download the roster(s) in question from CourseBook and save it in root directory.
    1. It is fine to put as many in here as you want, but you probably want to download a PDF, run `make`, download a new PDF, run `make`, et cetera.
    1. Rosters need to be saved with names that contain no whitespace or other characters which are special to `bash` or `make`.
@@ -17,6 +19,8 @@
 ## If NetIDs are not Detected Correctly
 
 *This does not seem to happen any more.*
+
+In order for this to work, you'll need to install `zenity`.
 
 1. Suppose NetIDs are not being detected correctly from `foo.pdf`.
 1. Option: you're brave/sure of the problem.
@@ -32,11 +36,19 @@
 
 # To Make an XLSX Roster
 
+In order for this to work, you'll need to install the python library for dealing with XLSX:
+
+```
+pip install --user openpyxl
+```
+
 1. Create `foo.xlsx` in the root directory, containing a grid of NetIDs.
 1. Type `make`
 1. `build/foo.xlsx` will be created.
 
 # To Make a TeX/PDF Roster
+
+In order for this to work, you'll need a TeX installation with `pdflatex`.
 
 1. Create `foo.csv` in the root directory, containing a grid of NetIDs.
 1. Type `make`
