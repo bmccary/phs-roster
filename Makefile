@@ -116,7 +116,7 @@ $(BUILD)/%.pdf/recurse: build.mk .csv .pdf .ppm .txt
 	touch $@
 
 $(BUILD)/%.xlsx: %.xlsx .csv .netid 
-	python2 xlsx-to-xlsx.py --csv $(BUILD)/csv --netid $(BUILD)/netid --xlsx0 $< --xlsx1 $@  --width $(WORKSHEET_IMAGE_COL_WIDTH) --height $(WORKSHEET_IMAGE_ROW_HEIGHT)
+	$(PYTHON) xlsx-to-xlsx.py --csv $(BUILD)/csv --netid $(BUILD)/netid --xlsx0 $< --xlsx1 $@  --width $(WORKSHEET_IMAGE_COL_WIDTH) --height $(WORKSHEET_IMAGE_ROW_HEIGHT)
 
 local.sty:
 	( \
