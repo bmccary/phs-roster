@@ -13,13 +13,17 @@ TXT := $(ROSTER:%=$(BUILD)/%/txt)
 XLSX0 := $(wildcard *.xlsx)
 XLSX1 := $(XLSX0:%=$(BUILD)/%)
 
+CSV0 := $(wildcard *.csv)
+TEX1 := $(CSV0:%.csv=$(BUILD)/%.tex)
+PDF1 := $(TEX1:%.tex=%.pdf)
+
 RECURSE := $(ROSTER:%=$(BUILD)/%/recurse)
 
 NETID := $(ROSTER:%=$(BUILD)/%/netid)
 
 PNG = $(foreach x,$(NETID),$(wildcard $(x)/*.png))
 
-ALL := .csv .netid .pdf .ppm .txt .recurse .xlsx
+ALL := .csv .netid .pdf .ppm .tex1 .pdf1 .txt .recurse .xlsx
 
 all: $(ALL)
 
@@ -47,6 +51,12 @@ $(BUILD)/csv: $(CSV)
 .xlsx: $(XLSX1)
 	touch $@
 
+.tex1: $(TEX1)
+	touch $@
+
+.pdf1: $(PDF1)
+	touch $@
+
 $(BUILD)/%.pdf/pdf: %.pdf
 	rm -f '$@'
 	mkdir -p '$(dir $@)'
@@ -69,11 +79,11 @@ $(BUILD)/%.pdf/txt: %.pdf
 $(BUILD)/%.pdf/csv: $(BUILD)/%.pdf/txt
 	$(PYTHON) txt-to-csv.py --txt '$<' --csv '$@' --debug 1
 
-$(BUILD)/%.pdf/recurse: build.mk .csv .pdf .ppm .txt always
+$(BUILD)/%.pdf/recurse: build.mk .csv .pdf .ppm .txt
 	cd $(dir $@) && $(MAKE) -f $(realpath $<)
 	touch $@
 
-.netid: always
+.netid: .recurse
 	rm -rf $(BUILD)/netid
 	mkdir -p $(BUILD)/netid
 	cd $(BUILD)/netid; \
@@ -103,9 +113,23 @@ $(BUILD)/%.pdf/recurse: build.mk .csv .pdf .ppm .txt always
 		esac; \
 		ln -s $$i/$$(ls -1 $$i | head -n 1) $$i.png; \
 	done
+	touch $@
 
-build/%.xlsx: %.xlsx
-	python2 xlsx-to-xlsx.py --xlsx0 $< --xlsx1 $@ --csv $(BUILD)/csv --netid $(BUILD)/netid --width $(WORKSHEET_IMAGE_COL_WIDTH) --height $(WORKSHEET_IMAGE_ROW_HEIGHT)
+$(BUILD)/%.xlsx: %.xlsx .csv .netid 
+	python2 xlsx-to-xlsx.py --csv $(BUILD)/csv --netid $(BUILD)/netid --xlsx0 $< --xlsx1 $@  --width $(WORKSHEET_IMAGE_COL_WIDTH) --height $(WORKSHEET_IMAGE_ROW_HEIGHT)
+
+local.sty:
+	( \
+		echo "\\def\\imwidth{50mm}";
+	) > $@
+
+$(BUILD)/%.tex: %.csv local.sty .netid
+	$(PYTHON) csv-to-tex.py --csv $(BUILD)/csv --netid $(BUILD)/netid --csv0 $< --tex1 $@ --sty $(basename local.sty)
+
+$(BUILD)/%.pdf: $(BUILD)/%.tex local.sty .netid
+	pdflatex -output-directory $(dir $<) $< 
+	pdflatex -output-directory $(dir $<) $< 
+	rm -f $(basename $<).{aux,log,out}
 
 always: ;
 

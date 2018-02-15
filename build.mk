@@ -15,7 +15,7 @@ all: $(ALL)
 
 .netid: csv
 	rm -rf netid
-	$(PDF_VIEWER) pdf &
+	if [[ "$(YESNO)" != "true" ]]; then $(PDF_VIEWER) pdf & fi
 	$(MAKE) -f $(THISMK) .netid-r
 	touch $@
 
