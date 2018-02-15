@@ -7,7 +7,7 @@
 
 # To Parse out NetID Images from CourseBook
 
-In order for this to work, you'll need to install `poppler`.
+In order for this to work, you'll need to install `poppler` (to extract data from PDFs) and `ImageMagick` (to process images).
 
 1. Download the roster(s) in question from CourseBook and save it in root directory.
    1. It is fine to put as many in here as you want, but you probably want to download a PDF, run `make`, download a new PDF, run `make`, et cetera.
