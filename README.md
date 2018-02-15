@@ -28,7 +28,7 @@
    1. `make YESNO=YESNO_ZENITY`
    1. You'll be asked individually for each picture.
    1. If you click *No* then the make will crash at that spot, identifying the location of the problem for you.
-   1. Now be brave and edit.
+   1. Now be brave and do the previous option.
 
 # To Make an XLSX Roster
 
