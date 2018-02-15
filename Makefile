@@ -41,7 +41,7 @@ clean:
 $(BUILD)/%.pdf/pdf: %.pdf
 	rm -f '$@'
 	mkdir -p '$(dir $@)'
-	ln -r -s '$<' '$@'
+	cd '$(dir $@)' && ln -s ../../'$<' '$(notdir $@)'
 
 $(BUILD)/%.pdf/ppm: %.pdf
 	rm -rf '$@'
@@ -67,11 +67,12 @@ $(BUILD)/%.pdf/recurse: build.mk .csv .pdf .ppm .txt always
 .netid: always
 	rm -rf $(BUILD)/netid
 	mkdir -p $(BUILD)/netid
+	cd $(BUILD)/netid; \
 	for i in $(PNG); \
 	do \
-		d=$(BUILD)/netid/$$(echo $$i | sed -r 's/$(BUILD)\/(.+\.pdf)\/netid\/(.+)\.png/\2\/\1\.png/g'); \
+		d=$$(echo $$i | sed -r 's/$(BUILD)\/(.+\.pdf)\/netid\/(.+)\.png/\2\/\1\.png/g'); \
 		mkdir -p $$(dirname $$d); \
-		ln -r -s $$i $$d; \
+		ln -s ../../../$$i $$d; \
 	done
 	cd $(BUILD)/netid; \
 	for i in *; \
@@ -85,7 +86,7 @@ $(BUILD)/%.pdf/recurse: build.mk .csv .pdf .ppm .txt always
 				;; \
 			*) \
 				echo "netid '$$i' appears in more than one roster (may be OK):"; \
-				for k in $$(ls -1 $$i); do echo -n "    "; readlink -f $$i/$$k; done; \
+				for k in $$(ls -1 $$i); do echo -n "    "; readlink $$i/$$k; done; \
 				;; \
 		esac; \
 		ln -s $$i/$$(ls -1 $$i | head -n 1) $$i.png; \
