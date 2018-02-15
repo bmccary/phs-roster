@@ -15,7 +15,7 @@ all: $(ALL)
 
 .netid: csv
 	rm -rf netid
-	if [[ "$(value YESNO)" != "$(YESNO_TRUE)" ]]; then $(PDF_VIEWER) pdf & fi
+	if [[ "$(YESNO)" != "YESNO_TRUE" ]]; then $(PDF_VIEWER) pdf & fi
 	$(MAKE) -f $(THISMK) .netid-r
 	touch $@
 
