@@ -1,4 +1,9 @@
 
+# These are options that can be set at the command line.
+# E.g.,
+#
+# make PYTHON=python2 PREFIX=something-less-dramatic
+
 # The directory that files will be put into
 BUILD := build
 
