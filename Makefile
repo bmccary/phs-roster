@@ -10,21 +10,27 @@ PDF := $(ROSTER:%=$(BUILD)/%/pdf)
 PPM := $(ROSTER:%=$(BUILD)/%/ppm)
 TXT := $(ROSTER:%=$(BUILD)/%/txt)
 
+XLSX0 := $(wildcard *.xlsx)
+XLSX1 := $(XLSX0:%=$(BUILD)/%)
+
 RECURSE := $(ROSTER:%=$(BUILD)/%/recurse)
 
 NETID := $(ROSTER:%=$(BUILD)/%/netid)
 
 PNG = $(foreach x,$(NETID),$(wildcard $(x)/*.png))
 
-ALL := .csv .pdf .ppm .txt .recurse .netid
+ALL := .csv .netid .pdf .ppm .txt .recurse .xlsx
 
 all: $(ALL)
 
 clean:
 	rm -rf $(BUILD) $(ALL)
 
-.csv: $(CSV)
+.csv: $(CSV) $(BUILD)/csv
 	touch $@
+
+$(BUILD)/csv: $(CSV)
+	$(PYTHON) merge-csv.py --csv1 $@ --csv0 $+
 
 .pdf: $(PDF)
 	touch $@
@@ -36,6 +42,9 @@ clean:
 	touch $@
 
 .recurse: $(RECURSE)
+	touch $@
+
+.xlsx: $(XLSX1)
 	touch $@
 
 $(BUILD)/%.pdf/pdf: %.pdf
@@ -85,12 +94,18 @@ $(BUILD)/%.pdf/recurse: build.mk .csv .pdf .ppm .txt always
 			1) \
 				;; \
 			*) \
-				echo "netid '$$i' appears in more than one roster (may be OK):"; \
-				for k in $$(ls -1 $$i); do echo -n "    "; readlink $$i/$$k; done; \
+				if [[ -n "$(NOTIFY_MULTIPLE)" ]]; \
+				then \
+					echo "netid '$$i' appears in more than one roster (may be OK):"; \
+					for k in $$(ls -1 $$i); do echo -n "    "; readlink $$i/$$k; done; \
+				fi; \
 				;; \
 		esac; \
 		ln -s $$i/$$(ls -1 $$i | head -n 1) $$i.png; \
 	done
+
+build/%.xlsx: %.xlsx
+	python2 xlsx-to-xlsx.py --xlsx0 $< --xlsx1 $@ --csv $(BUILD)/csv --netid $(BUILD)/netid --width $(WORKSHEET_IMAGE_COL_WIDTH) --height $(WORKSHEET_IMAGE_ROW_HEIGHT)
 
 always: ;
 
