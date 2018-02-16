@@ -31,13 +31,13 @@ all: $(ALL)
 .netid-r: $(PNG)
 	touch $@
 
-netid-to-index = $(shell grep $(1) $(2) | cut -f 1 -d ,)
+netid-to-i = $(shell grep $(1) $(2) | cut -f $(3) -d ,)
 
 netid/%.png: csv
 	rm -f '$@'
 	mkdir -p $(dir $@)
-	if [[ "$(YESNO)" != "YESNO_TRUE" ]]; then $(IMAGE_VIEWER) 'ppm/$(call netid-to-index,$*,$<).ppm' & echo "$$!" > '$*.pid'; fi
-	if $(call $(YESNO),$(notdir $*)); then convert -resize x$(IMAGE_CONVERT_HEIGHT) 'ppm/$(call netid-to-index,$*,$<).ppm' '$@'; else exit 1; fi
+	if [[ "$(YESNO)" != "YESNO_TRUE" ]]; then $(IMAGE_VIEWER) 'ppm/$(call netid-to-i,$*,$<,1).ppm' & echo "$$!" > '$*.pid'; fi
+	if $(call $(YESNO),$(notdir $*)); then convert -resize x$(IMAGE_CONVERT_HEIGHT) 'ppm/$(call netid-to-i,$*,$<,1).ppm' '$@'; else exit 1; fi
 	kill "$$(< $*.pid)" || true
 	rm -f '$*.pid'
 
@@ -51,8 +51,8 @@ netid/%.png: csv
 
 stamp/%.png: netid/%.png
 	mkdir -p $(dir $@)
-	convert -undercolor White -gravity South -pointsize 30 -annotate 0 '$(basename $(notdir $@))' $< $@
+	convert -undercolor White -gravity South -pointsize 20 -annotate 0 "$(call netid-to-i,$*,csv,3), $(call netid-to-i,$*,csv,4)\n$*" $< $@
 
-drag-and-drop.xlsx: .stamp
+drag-and-drop.xlsx: .stamp 
 	$(PYTHON) $(dir $(THISMK))/drag-and-drop-xlsx.py --xlsx1 $@ --netid stamp --imwidth $(XLSX_IMAGE_COL_WIDTH) --imheight $(XLSX_IMAGE_ROW_HEIGHT) --width $(XLSX_DRAG_AND_DROP_IMAGES_PER_ROW)
 
