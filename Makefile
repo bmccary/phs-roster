@@ -127,7 +127,7 @@ $(BUILD)/%.pdf/recurse: build.mk .csv .pdf .ppm .txt
 	touch $@
 
 $(BUILD)/%.xlsx: %.csv .csv .netid 
-	$(PYTHON) csv-to-xlsx.py --csv $(BUILD)/csv --netid $(BUILD)/netid --csv0 $< --xlsx1 $@ --width $(WORKSHEET_IMAGE_COL_WIDTH) --height $(WORKSHEET_IMAGE_ROW_HEIGHT) $(FLIP_LR) $(FLIP_TB)
+	$(PYTHON) csv-to-xlsx.py --csv $(BUILD)/csv --netid $(BUILD)/netid --csv0 $< --xlsx1 $@ --width $(WORKSHEET_IMAGE_COL_WIDTH) --height $(WORKSHEET_IMAGE_ROW_HEIGHT) $(FLIP)
 
 local.sty:
 	( \
@@ -135,7 +135,7 @@ local.sty:
 	) > $@
 
 $(BUILD)/%.tex: %.csv local.sty .netid
-	$(PYTHON) csv-to-tex.py --csv $(BUILD)/csv --netid $(BUILD)/netid --csv0 $< --tex1 $@ --sty $(basename local.sty) $(FLIP_LR) $(FLIP_TB) --orientation $(ORIENTATION)
+	$(PYTHON) csv-to-tex.py --csv $(BUILD)/csv --netid $(BUILD)/netid --csv0 $< --tex1 $@ --sty $(basename local.sty) $(FLIP) --orientation $(ORIENTATION)
 
 $(BUILD)/%.pdf: $(BUILD)/%.tex local.sty .netid
 	pdflatex -output-directory $(dir $<) $< 

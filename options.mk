@@ -59,12 +59,11 @@ IMAGE_CONVERT_HEIGHT := 250
 WORKSHEET_IMAGE_ROW_HEIGHT := 190
 WORKSHEET_IMAGE_COL_WIDTH := 22
 
-# Set to --flipLR to flip left-to-right, blank for nothing.
-FLIP_LR :=
-
-# Set to --flipTB to flip top-to-bottom, blank for nothing.
-# PHS likes this one.
-FLIP_TB := --flipTB
+# Add --flipLR to flip left-to-right.
+# Add --flipTB to flip top-to-bottom.
+# Blank means nothing. E.g.,
+# FLIP := --flipTB --flipLR
+FLIP := --flipTB
 
 # The orientation of the page. Only applies to TeX/PDF.
 # May be landscape or portrait.
