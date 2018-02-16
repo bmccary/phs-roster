@@ -56,8 +56,12 @@ IMAGE_CONVERT_HEIGHT := 250
 # cells manually. Further, I haven't figured out what
 # coordinate system the spreadsheet uses, so these
 # values are discovered by hand.
-WORKSHEET_IMAGE_ROW_HEIGHT := 190
-WORKSHEET_IMAGE_COL_WIDTH := 22
+XLSX_IMAGE_ROW_HEIGHT := 190
+XLSX_IMAGE_COL_WIDTH := 22
+
+# The number of images per wor in the drag-and-drop
+# version of the roster.
+XLSX_DRAG_AND_DROP_IMAGES_PER_ROW := 8
 
 # Add --flipLR to flip left-to-right.
 # Add --flipTB to flip top-to-bottom.

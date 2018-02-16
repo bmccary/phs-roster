@@ -150,7 +150,7 @@ def mkparser(description):
 
 if __name__ == '__main__':
 
-    parser = mkparser('XLSX input to XLSX output.')
+    parser = mkparser('CSV input to TeX output.')
 
     options = parser.parse_args()
 

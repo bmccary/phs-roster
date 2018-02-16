@@ -9,15 +9,16 @@ include $(dir $(THISMK))/options.mk
 NETID := $(shell cat csv | tail -n +2 | cut -f 2 -d ,)
 
 PNG := $(NETID:%=netid/%.png)
+STAMP := $(PNG:netid/%.png=stamp/%.png)
 
-ALL := .netid .netid-r $(PNG)
+ALL := .netid .netid-r .stamp .stamp-r $(PNG) $(STAMP) drag-and-drop.xlsx
 
 all: $(ALL)
 
 .netid: csv
 	rm -rf netid
 	if [[ "$(YESNO)" != "YESNO_TRUE" ]]; then $(PDF_VIEWER) pdf & fi
-	$(MAKE) -f $(THISMK) .netid-r
+	$(MAKE) -f $(THISMK) $@-r
 	touch $@
 
 .netid-r: $(PNG)
@@ -32,4 +33,19 @@ netid/%.png: csv
 	if $(call $(YESNO),$(notdir $*)); then convert -resize x$(IMAGE_CONVERT_HEIGHT) 'ppm/$(call netid-to-index,$*,$<).ppm' '$@'; else exit 1; fi
 	kill "$$(< $*.pid)" || true
 	rm -f '$*.pid'
+
+.stamp: .netid
+	rm -rf stamp
+	$(MAKE) -f $(THISMK) $@-r
+	touch $@
+
+.stamp-r: $(STAMP)
+	touch $@
+
+stamp/%.png: netid/%.png
+	mkdir -p $(dir $@)
+	convert -undercolor White -gravity South -pointsize 30 -annotate 0 '$(basename $(notdir $@))' $< $@
+
+drag-and-drop.xlsx: .stamp
+	$(PYTHON) $(dir $(THISMK))/drag-and-drop-xlsx.py --xlsx1 $@ --netid stamp --imwidth $(XLSX_IMAGE_COL_WIDTH) --imheight $(XLSX_IMAGE_ROW_HEIGHT) --width $(XLSX_DRAG_AND_DROP_IMAGES_PER_ROW)
 
