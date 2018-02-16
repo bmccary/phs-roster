@@ -91,7 +91,7 @@ def mkparser(description):
 
 if __name__ == '__main__':
 
-    parser = mkparser('XLSX input to XLSX output.')
+    parser = mkparser('Drag and Drop XLSX output.')
 
     options = parser.parse_args()
 
