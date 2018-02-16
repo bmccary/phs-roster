@@ -15,10 +15,10 @@ STAMP :=
 DRAG_AND_DROP :=
 else
 STAMP := $(PNG:netid/%.png=stamp/%.png)
-DRAG_AND_DROP := $(STAMP) .stamp .stamp-r drag-and-drop.xlsx
+DRAG_AND_DROP := .stamp drag-and-drop.xlsx
 endif
 
-ALL := .netid .netid-r $(PNG) $(DRAG_AND_DROP)
+ALL := .netid $(PNG) $(DRAG_AND_DROP)
 
 all: $(ALL)
 
@@ -38,7 +38,7 @@ netid/%.png: csv
 	mkdir -p $(dir $@)
 	if [[ "$(YESNO)" != "YESNO_TRUE" ]]; then $(IMAGE_VIEWER) 'ppm/$(call netid-to-i,$*,$<,1).ppm' & echo "$$!" > '$*.pid'; fi
 	if $(call $(YESNO),$(notdir $*)); then convert -resize x$(IMAGE_CONVERT_HEIGHT) 'ppm/$(call netid-to-i,$*,$<,1).ppm' '$@'; else exit 1; fi
-	kill "$$(< $*.pid)" || true
+	if [[ "$(YESNO)" != "YESNO_TRUE" ]]; then kill "$$(< $*.pid)" || true; fi
 	rm -f '$*.pid'
 
 .stamp: .netid
