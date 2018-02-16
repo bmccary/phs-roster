@@ -27,7 +27,7 @@ In order for this to work, you'll need to install `zenity`.
 1. Suppose NetIDs are not being detected correctly from `foo.pdf`.
 1. Option: you're brave/sure of the problem.
    1. Edit `build/foo.pdf/csv` and fix the problem yourself.
-   1. Cross-reference the `foo.pdf` file.
+   1. Cross-reference the `foo.pdf` file with your eyeballs.
    1. `make`
 1. Option: you're not sure where the problem is:
    1. Remove what was automatically parsed: `rm -rf build/foo.pdf`
