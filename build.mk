@@ -9,9 +9,16 @@ include $(dir $(THISMK))/options.mk
 NETID := $(shell cat csv | tail -n +2 | cut -f 2 -d ,)
 
 PNG := $(NETID:%=netid/%.png)
-STAMP := $(PNG:netid/%.png=stamp/%.png)
 
-ALL := .netid .netid-r .stamp .stamp-r $(PNG) $(STAMP) drag-and-drop.xlsx
+ifeq ($(strip $(MAKE_DRAG_AND_DROP)),)
+STAMP :=
+DRAG_AND_DROP :=
+else
+STAMP := $(PNG:netid/%.png=stamp/%.png)
+DRAG_AND_DROP := $(STAMP) .stamp .stamp-r drag-and-drop.xlsx
+endif
+
+ALL := .netid .netid-r $(PNG) $(DRAG_AND_DROP)
 
 all: $(ALL)
 

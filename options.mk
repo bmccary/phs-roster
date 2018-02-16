@@ -8,16 +8,19 @@
 # with greatest being the one used.
 #
 # You probably shouldn't edit this file b/c it is included
-# in the repo.
+# in the repo (edit local.mk).
 
-# The directory that files will be put into
+# The directory that files will be put into.
 BUILD := build
 
-# Set to non-blank to make XLSX rosters
+# Set to non-blank to make XLSX rosters.
 MAKE_XLSX := that-would-be-great
 
-# Set to non-blank to make PDF rosters
+# Set to non-blank to make PDF rosters.
 MAKE_PDF := this-would-be-great-too
+
+# Set to non-blank to make drag-and-drop roster.
+MAKE_DRAG_AND_DROP := allegedly-great
 
 # pdfimages makes files with pattern $(PREFIX)-%03d.ppm
 # and the hyphen is included even if $(PREFIX) is empty.
@@ -66,10 +69,12 @@ XLSX_DRAG_AND_DROP_IMAGES_PER_ROW := 8
 # Add --flipLR to flip left-to-right.
 # Add --flipTB to flip top-to-bottom.
 # Blank means nothing. E.g.,
+#
 # FLIP := --flipTB --flipLR
+#
 FLIP := --flipTB
 
 # The orientation of the page. Only applies to TeX/PDF.
-# May be landscape or portrait.
+# Must be landscape or portrait.
 ORIENTATION := landscape
 
