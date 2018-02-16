@@ -12,8 +12,15 @@ def go(options):
     with open(options.csv, 'r') as r:
         N = {row['netid']: row for row in csv.DictReader(r)}
 
-    wb0 = openpyxl.load_workbook(options.xlsx0, read_only=False)
-    ws0 = wb0.active
+    with open(options.csv0, 'r') as r:
+        rows0 = list(csv.reader(r))
+
+    if options.flipLR:
+        for row in rows0:
+            row.reverse()
+
+    if options.flipTB:
+        rows0.reverse()
 
     def join(X, s=None):
         def g():
@@ -23,34 +30,36 @@ def go(options):
             yield X[-1]
         return list(g())
 
+
+
     def g():
         def image(x):
-            if x is None:
-                return None
-            path = os.path.join(options.netid, '{x}.png'.format(x=x))
-            return openpyxl.drawing.image.Image(path)
+            if x:
+                path = os.path.join(options.netid, '{x}.png'.format(x=x))
+                return openpyxl.drawing.image.Image(path)
+            return None
         def name(x):
-            if x is None:
-                return None
-            return '{last_name}, {first_name}'.format(**N[x])
-        for row in ws0.rows:
-            yield join([image(x.value) for x in row])
-            yield join([name(x.value) for x in row])
-            yield join([x.value for x in row])
+            if x:
+                return '{last_name}, {first_name}'.format(**N[x])
+            return None
+        for row in rows0:
+            yield join([image(x) for x in row])
+            yield join([name(x) for x in row])
+            yield join([x for x in row])
             yield join([None for x in row])
 
-    rows = list(g())
+    rows1 = list(g())
 
     wb1 = openpyxl.Workbook()
     ws1 = wb1.active
 
-    for i, row in enumerate(rows):
+    for i, row in enumerate(rows1):
         for j, v in enumerate(row):
             c = ws1.cell(row=i+1, column=j+1)
             ws1.row_dimensions[c.row].height = 15
             ws1.column_dimensions[c.column].width = 2
         
-    for i, row in enumerate(rows):
+    for i, row in enumerate(rows1):
         for j, v in enumerate(row):
             c = ws1.cell(row=i+1, column=j+1)
             if isinstance(v, openpyxl.drawing.image.Image):
@@ -82,10 +91,10 @@ def mkparser(description):
             help='''Turn on script debugging.'''
         )
     parser.add_argument(
-            '--xlsx0', 
+            '--csv0', 
             required=True, 
             type=str,
-            help='''The XLSX input.'''
+            help='''The CSV input.'''
             )
     parser.add_argument(
             '--xlsx1', 
@@ -116,6 +125,18 @@ def mkparser(description):
             required=True, 
             type=int,
             help='''The height of the image-containing columns.'''
+            )
+    parser.add_argument(
+            '--flipLR', 
+            default=False,
+            action='store_true',
+            help='''Flip left-to-right.'''
+            )
+    parser.add_argument(
+            '--flipTB', 
+            default=False,
+            action='store_true',
+            help='''Flip top-to-bottom.'''
             )
     return parser
 

@@ -9,15 +9,25 @@ def go(options):
         N = {row['netid']: row for row in csv.DictReader(r)}
 
     with open(options.csv0, 'r') as r:
-        rows = list(csv.reader(r))
+        rows0 = list(csv.reader(r))
+
+    if options.flipLR:
+        for row in rows0:
+            row.reverse()
+
+    if options.flipTB:
+        rows0.reverse()
 
     def g():
-        yield r'\documentclass[10pt]{article}'
-        yield r'\usepackage[top=6mm,left=2mm,bottom=6mm,right=2mm]{geometry}'
+        if options.orientation == 'landscape':
+            yield r'\documentclass[10pt, landscape]{article}'
+        else:
+            yield r'\documentclass[10pt]{article}'
+        yield r'\usepackage[top=6mm, left=2mm, bottom=6mm, right=2mm]{geometry}'
         yield r'\usepackage{nopageno}'
         yield r'\usepackage{graphicx}'
 
-        yield r'\def\imwidth{50mm}'
+        yield r'\def\imheight{50mm}'
 
         if options.sty:
             yield r'\usepackage{{{sty}}}'.format(sty=options.sty)
@@ -29,7 +39,7 @@ def go(options):
         def image(x):
             if x:
                 path = os.path.join(options.netid, '{x}.png'.format(x=x))
-                return r'\includegraphics[width=\imwidth]{{{path}}}'.format(path=path)
+                return r'\includegraphics[width=\imheight]{{{path}}}'.format(path=path)
             return None
 
         def name(x):
@@ -42,7 +52,7 @@ def go(options):
                 return r'\texttt{{{netid}}}'.format(**N[x])
             return None
 
-        W = max(len(row) for row in rows)
+        W = max(len(row) for row in rows0)
         cs = '|'.join('c'*W)
 
         yield r'\begin{{tabular}}{{|{cs}|}}'.format(cs=cs)
@@ -57,7 +67,7 @@ def go(options):
         def join(row):
             return ' & '.join(x or '' for x in row) + r'\\ \hline'
 
-        for row in rows:
+        for row in rows0:
             yield join([image(x) for x in pg(row)])
             yield join([name(x) for x in pg(row)])
             yield join([netid(x) for x in pg(row)])
@@ -117,6 +127,24 @@ def mkparser(description):
             '--sty', 
             type=str,
             help='''The STY to include.'''
+            )
+    parser.add_argument(
+            '--orientation', 
+            choices=['portrait', 'landscape'],
+            default='landscape',
+            help='''The orientation of the page.'''
+            )
+    parser.add_argument(
+            '--flipLR', 
+            default=False,
+            action='store_true',
+            help='''Flip left-to-right.'''
+            )
+    parser.add_argument(
+            '--flipTB', 
+            default=False,
+            action='store_true',
+            help='''Flip top-to-bottom.'''
             )
     return parser
 

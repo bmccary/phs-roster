@@ -2,7 +2,9 @@
 *.swp
 *.xlsx
 *.csv
-*.sty
+
+local.sty
+local.mk
 
 build/
 

@@ -4,6 +4,7 @@ SHELL := /bin/bash
 THISMK := $(lastword $(MAKEFILE_LIST))
 
 include $(dir $(THISMK))/options.mk
+-include $(dir $(THISMK))/local.mk
 
 NETID := $(shell cat csv | tail -n +2 | cut -f 2 -d ,)
 

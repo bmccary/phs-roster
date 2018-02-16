@@ -2,6 +2,7 @@
 SHELL := /bin/bash
 
 include options.mk
+-include local.mk
 
 ROSTER := $(wildcard *.pdf)
 
@@ -10,12 +11,22 @@ PDF := $(ROSTER:%=$(BUILD)/%/pdf)
 PPM := $(ROSTER:%=$(BUILD)/%/ppm)
 TXT := $(ROSTER:%=$(BUILD)/%/txt)
 
-XLSX0 := $(wildcard *.xlsx)
-XLSX1 := $(XLSX0:%=$(BUILD)/%)
 
 CSV0 := $(wildcard *.csv)
+
+ifeq ($(strip $(MAKE_PDF)),)
+TEX1 :=
+PDF1 :=
+else
 TEX1 := $(CSV0:%.csv=$(BUILD)/%.tex)
 PDF1 := $(TEX1:%.tex=%.pdf)
+endif
+
+ifeq ($(strip $(MAKE_XLSX)),)
+XLSX1 :=
+else
+XLSX1 := $(CSV0:%.csv=$(BUILD)/%.xlsx)
+endif
 
 RECURSE := $(ROSTER:%=$(BUILD)/%/recurse)
 
@@ -89,7 +100,7 @@ $(BUILD)/%.pdf/recurse: build.mk .csv .pdf .ppm .txt
 	cd $(BUILD)/netid; \
 	for i in $(PNG); \
 	do \
-		d=$$(echo $$i | sed -r 's/$(BUILD)\/(.+\.pdf)\/netid\/(.+)\.png/\2\/\1\.png/g'); \
+		d=$$(echo $$i | perl -p -e 's/$(BUILD)\/(.+\.pdf)\/netid\/(.+)\.png/$$2\/$$1\.png/g'); \
 		mkdir -p $$(dirname $$d); \
 		ln -s ../../../$$i $$d; \
 	done
@@ -115,16 +126,16 @@ $(BUILD)/%.pdf/recurse: build.mk .csv .pdf .ppm .txt
 	done
 	touch $@
 
-$(BUILD)/%.xlsx: %.xlsx .csv .netid 
-	$(PYTHON) xlsx-to-xlsx.py --csv $(BUILD)/csv --netid $(BUILD)/netid --xlsx0 $< --xlsx1 $@  --width $(WORKSHEET_IMAGE_COL_WIDTH) --height $(WORKSHEET_IMAGE_ROW_HEIGHT)
+$(BUILD)/%.xlsx: %.csv .csv .netid 
+	$(PYTHON) csv-to-xlsx.py --csv $(BUILD)/csv --netid $(BUILD)/netid --csv0 $< --xlsx1 $@ --width $(WORKSHEET_IMAGE_COL_WIDTH) --height $(WORKSHEET_IMAGE_ROW_HEIGHT) $(FLIP_LR) $(FLIP_TB)
 
 local.sty:
 	( \
-		echo "\\def\\imwidth{50mm}";
+		echo "\\def\\imheight{50mm}"; \
 	) > $@
 
 $(BUILD)/%.tex: %.csv local.sty .netid
-	$(PYTHON) csv-to-tex.py --csv $(BUILD)/csv --netid $(BUILD)/netid --csv0 $< --tex1 $@ --sty $(basename local.sty)
+	$(PYTHON) csv-to-tex.py --csv $(BUILD)/csv --netid $(BUILD)/netid --csv0 $< --tex1 $@ --sty $(basename local.sty) $(FLIP_LR) $(FLIP_TB) --orientation $(ORIENTATION)
 
 $(BUILD)/%.pdf: $(BUILD)/%.tex local.sty .netid
 	pdflatex -output-directory $(dir $<) $< 
