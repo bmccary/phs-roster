@@ -72,7 +72,7 @@ XLSX_DRAG_AND_DROP_IMAGES_PER_ROW := 8
 #
 # FLIP := --flipTB --flipLR
 #
-FLIP := --flipTB
+FLIP := --flipTB --flipLR
 
 # The orientation of the page. Only applies to TeX/PDF.
 # Must be landscape or portrait.

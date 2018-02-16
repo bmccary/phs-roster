@@ -34,7 +34,7 @@ NETID := $(ROSTER:%=$(BUILD)/%/netid)
 
 PNG = $(foreach x,$(NETID),$(wildcard $(x)/*.png))
 
-ALL := .csv .netid .pdf .ppm .tex1 .pdf1 .txt .recurse .xlsx
+ALL := .csv .netid .pdf .ppm .tex1 .pdf1 .txt .recurse .xlsx .stamp
 
 all: $(ALL)
 
@@ -94,17 +94,18 @@ $(BUILD)/%.pdf/recurse: build.mk .csv .pdf .ppm .txt
 	cd $(dir $@) && $(MAKE) -f $(realpath $<)
 	touch $@
 
-.netid: .recurse
-	rm -rf $(BUILD)/netid
-	mkdir -p $(BUILD)/netid
-	cd $(BUILD)/netid; \
+.netid .stamp: .recurse
+	rm -rf $(BUILD)/$(subst .,,$@)
+	mkdir -p $(BUILD)/$(subst .,,$@)
+	cd $(BUILD)/$(subst .,,$@); \
 	for i in $(PNG); \
 	do \
-		d=$$(echo $$i | perl -p -e 's/$(BUILD)\/(.+\.pdf)\/netid\/(.+)\.png/$$2\/$$1\.png/g'); \
+		d=$$(echo $$i | perl -p -e 's#$(BUILD)/(.+\.pdf)/netid/(.+)\.png#$$2/$$1\.png#g'); \
+		s=$$(echo $$i | perl -p -e 's#$(BUILD)/(.+\.pdf)/(netid)/(.+\.png)#$(BUILD)/$$1/$(subst .,,$@)/$$3#g'); \
 		mkdir -p $$(dirname $$d); \
-		ln -s ../../../$$i $$d; \
+		ln -s ../../../$$s $$d; \
 	done
-	cd $(BUILD)/netid; \
+	cd $(BUILD)/$(subst .,,$@); \
 	for i in *; \
 	do \
 		case $$(ls -1 $$i | wc -l) in \
