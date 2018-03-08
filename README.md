@@ -1,8 +1,8 @@
 
 # Instructions
 
-1. `git clone https://github.com/bmccary/phs-roster.git`
-1. `cd phs-roster`
+1. `git clone https://github.com/bmccary/utd-roster-tool.git`
+1. `cd utd-roster-tool`
 1. We will call this directory the root directory.
 1. There are many options which are described in the file `options.mk`. You shouldn't edit that file though. Rather edit/create the file `local.mk` set the value you want there, which will override the value in `options.mk`.
 
